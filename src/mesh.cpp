@@ -509,6 +509,7 @@ std::vector< int > Mesh::collectMeshStats() {
 	V = this->mVertexList.size();
 	E = this->mHEdgeList.size() + this->mBHEdgeList.size();
 	F = this->mFaceList.size();
+	B = this->countBoundaryLoops();
 	
 	/*====== Programming Assignment 0 ======*/
 
@@ -524,7 +525,22 @@ std::vector< int > Mesh::collectMeshStats() {
 
 int Mesh::countBoundaryLoops() {
 	int count = 0;
+	for(int i = 0; i < this->mBHEdgeList.size(); ++i) {
+		HEdge* edge = this->mBHEdgeList[i];
+		if(edge->flag) {
+			continue;
+		}
+		HEdge* nextEdge = edge->next();
+		while(edge != nextEdge) {
+			if(std::find(this->mBHEdgeList.begin(), this->mBHEdgeList.end(), nextEdge) != this->mBHEdgeList.end()) {
+				nextEdge->setFlag(true);
+			}
+			nextEdge = nextEdge->next();
+		}
 
+		++count;
+		edge->setFlag(true);
+	}
 	/*====== Programming Assignment 0 ======*/
 
 	/**********************************************/
