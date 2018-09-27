@@ -3,8 +3,8 @@
 #include <igl/read_triangle_mesh.h>
 #include <Eigen/Sparse>
 
-
-HEdge::HEdge(bool b) {
+HEdge::HEdge(bool b)
+{
 	mBoundary = b;
 
 	mTwin = nullptr;
@@ -18,223 +18,276 @@ HEdge::HEdge(bool b) {
 	mValid = true;
 }
 
-HEdge* HEdge::twin() const {
+HEdge *HEdge::twin() const
+{
 	return mTwin;
 }
 
-HEdge* HEdge::setTwin(HEdge* e) {
+HEdge *HEdge::setTwin(HEdge *e)
+{
 	mTwin = e;
 	return mTwin;
 }
 
-HEdge* HEdge::prev() const {
+HEdge *HEdge::prev() const
+{
 	return mPrev;
 }
 
-HEdge* HEdge::setPrev(HEdge* e) {
+HEdge *HEdge::setPrev(HEdge *e)
+{
 	mPrev = e;
 	return mPrev;
 }
 
-HEdge* HEdge::next() const {
+HEdge *HEdge::next() const
+{
 	return mNext;
 }
 
-HEdge* HEdge::setNext(HEdge* e) {
+HEdge *HEdge::setNext(HEdge *e)
+{
 	mNext = e;
 	return mNext;
 }
 
-Vertex* HEdge::start() const {
+Vertex *HEdge::start() const
+{
 	return mStart;
 }
 
-Vertex* HEdge::setStart(Vertex* v) {
+Vertex *HEdge::setStart(Vertex *v)
+{
 	mStart = v;
 	return mStart;
 }
 
-Vertex* HEdge::end() const {
+Vertex *HEdge::end() const
+{
 	return mNext->start();
 }
 
-Face* HEdge::leftFace() const {
+Face *HEdge::leftFace() const
+{
 	return mFace;
 }
 
-Face* HEdge::setFace(Face* f) {
+Face *HEdge::setFace(Face *f)
+{
 	mFace = f;
 	return mFace;
 }
 
-bool HEdge::flag() const {
+bool HEdge::flag() const
+{
 	return mFlag;
 }
 
-bool HEdge::setFlag(bool b) {
+bool HEdge::setFlag(bool b)
+{
 	mFlag = b;
 	return mFlag;
 }
 
-bool HEdge::isBoundary() const {
+bool HEdge::isBoundary() const
+{
 	return mBoundary;
 }
 
-bool HEdge::isValid() const {
+bool HEdge::isValid() const
+{
 	return mValid;
 }
 
-bool HEdge::setValid(bool b) {
+bool HEdge::setValid(bool b)
+{
 	mValid = b;
 	return mValid;
 }
 
-OneRingHEdge::OneRingHEdge(const Vertex* v) {
-	if (v == nullptr) {
+OneRingHEdge::OneRingHEdge(const Vertex *v)
+{
+	if (v == nullptr)
+	{
 		mStart = nullptr;
 		mNext = nullptr;
-	} else {
+	}
+	else
+	{
 		mStart = v->halfEdge();
 		mNext = v->halfEdge();
 	}
 }
 
-HEdge* OneRingHEdge::nextHEdge() {
-	HEdge* ret = mNext;
-	if (mNext != nullptr && mNext->prev()->twin() != mStart) {
+HEdge *OneRingHEdge::nextHEdge()
+{
+	HEdge *ret = mNext;
+	if (mNext != nullptr && mNext->prev()->twin() != mStart)
+	{
 		mNext = mNext->prev()->twin();
-	} else {
+	}
+	else
+	{
 		mNext = nullptr;
 	}
 	return ret;
 }
 
-OneRingVertex::OneRingVertex(const Vertex* v): ring(v) {
+OneRingVertex::OneRingVertex(const Vertex *v) : ring(v)
+{
 }
 
-Vertex* OneRingVertex::nextVertex() {
-	HEdge* he = ring.nextHEdge();
+Vertex *OneRingVertex::nextVertex()
+{
+	HEdge *he = ring.nextHEdge();
 	return he != nullptr ? he->end() : nullptr;
 }
 
-Vertex::Vertex() : mHEdge(nullptr), mFlag(0) {
+Vertex::Vertex() : mHEdge(nullptr), mFlag(0)
+{
 	mPosition = Eigen::Vector3f::Zero();
 	mColor = VCOLOR_BLUE;
 	mNormal = Eigen::Vector3f::Zero();
 }
 
-Vertex::Vertex(const Eigen::Vector3f& v): mPosition(v), mHEdge(nullptr), mFlag(0) {
+Vertex::Vertex(const Eigen::Vector3f &v) : mPosition(v), mHEdge(nullptr), mFlag(0)
+{
 	mColor = VCOLOR_BLUE;
 	mNormal = Eigen::Vector3f::Zero();
 }
 
-Vertex::Vertex(float x, float y, float z): mHEdge(nullptr), mFlag(0) {
+Vertex::Vertex(float x, float y, float z) : mHEdge(nullptr), mFlag(0)
+{
 	mPosition = Eigen::Vector3f(x, y, z);
 	mColor = VCOLOR_BLUE;
 	mNormal = Eigen::Vector3f::Zero();
 }
 
-
-const Eigen::Vector3f& Vertex::position() const {
+const Eigen::Vector3f &Vertex::position() const
+{
 	return mPosition;
 }
 
-const Eigen::Vector3f& Vertex::setPosition(const Eigen::Vector3f& p) {
+const Eigen::Vector3f &Vertex::setPosition(const Eigen::Vector3f &p)
+{
 	mPosition = p;
 	return mPosition;
 }
 
-const Eigen::Vector3f& Vertex::normal() const {
+const Eigen::Vector3f &Vertex::normal() const
+{
 	return mNormal;
 }
 
-const Eigen::Vector3f& Vertex::setNormal(const Eigen::Vector3f& n) {
+const Eigen::Vector3f &Vertex::setNormal(const Eigen::Vector3f &n)
+{
 	mNormal = n;
 	return mNormal;
 }
 
-const Eigen::Vector3f& Vertex::color() const {
+const Eigen::Vector3f &Vertex::color() const
+{
 	return mColor;
 }
 
-const Eigen::Vector3f& Vertex::setColor(const Eigen::Vector3f& c) {
+const Eigen::Vector3f &Vertex::setColor(const Eigen::Vector3f &c)
+{
 	mColor = c;
 	return mColor;
 }
 
-HEdge* Vertex::halfEdge() const {
+HEdge *Vertex::halfEdge() const
+{
 	return mHEdge;
 }
 
-HEdge* Vertex::setHalfEdge(HEdge* he) {
+HEdge *Vertex::setHalfEdge(HEdge *he)
+{
 	mHEdge = he;
 	return mHEdge;
 }
 
-int Vertex::index() const {
+int Vertex::index() const
+{
 	return mIndex;
 }
 
-int Vertex::setIndex(int i) {
+int Vertex::setIndex(int i)
+{
 	mIndex = i;
 	return mIndex;
 }
 
-int Vertex::flag() const {
+int Vertex::flag() const
+{
 	return mFlag;
 }
 
-int Vertex::setFlag(int f) {
+int Vertex::setFlag(int f)
+{
 	mFlag = f;
 	return mFlag;
 }
 
-bool Vertex::isValid() const {
+bool Vertex::isValid() const
+{
 	return mValid;
 }
 
-bool Vertex::setValid(bool b) {
+bool Vertex::setValid(bool b)
+{
 	mValid = b;
 	return mValid;
 }
 
-bool Vertex::isBoundary() const {
+bool Vertex::isBoundary() const
+{
 	OneRingHEdge ring(this);
-	HEdge* curr = nullptr;
-	while (curr = ring.nextHEdge()) {
-		if (curr->isBoundary()) {
+	HEdge *curr = nullptr;
+	while (curr = ring.nextHEdge())
+	{
+		if (curr->isBoundary())
+		{
 			return true;
 		}
 	}
 	return false;
 }
 
-int Vertex::valence() const {
+int Vertex::valence() const
+{
 	int count = 0;
 	OneRingVertex ring(this);
-	Vertex* curr = nullptr;
-	while (curr = ring.nextVertex()) {
+	Vertex *curr = nullptr;
+	while (curr = ring.nextVertex())
+	{
 		++count;
 	}
 	return count;
 }
 
-Face::Face() : mHEdge(nullptr), mValid(true) {
+Face::Face() : mHEdge(nullptr), mValid(true)
+{
 }
 
-HEdge* Face::halfEdge() const {
+HEdge *Face::halfEdge() const
+{
 	return mHEdge;
 }
 
-HEdge* Face::setHalfEdge(HEdge* he) {
+HEdge *Face::setHalfEdge(HEdge *he)
+{
 	mHEdge = he;
 	return mHEdge;
 }
 
-bool Face::isBoundary() const {
-	HEdge* curr = mHEdge;
-	do {
-		if (curr->twin()->isBoundary()) {
+bool Face::isBoundary() const
+{
+	HEdge *curr = mHEdge;
+	do
+	{
+		if (curr->twin()->isBoundary())
+		{
 			return true;
 		}
 		curr = curr->next();
@@ -242,70 +295,85 @@ bool Face::isBoundary() const {
 	return false;
 }
 
-bool Face::isValid() const {
+bool Face::isValid() const
+{
 	return mValid;
 }
 
-bool Face::setValid(bool b) {
+bool Face::setValid(bool b)
+{
 	mValid = b;
 	return mValid;
 }
 
-Mesh::Mesh() {
+Mesh::Mesh()
+{
 	mVertexPosFlag = true;
 	mVertexNormalFlag = true;
 	mVertexColorFlag = true;
 }
 
-Mesh::~Mesh() {
+Mesh::~Mesh()
+{
 	clear();
 }
 
-const std::vector< HEdge* >& Mesh::edges() const {
+const std::vector<HEdge *> &Mesh::edges() const
+{
 	return mHEdgeList;
 }
 
-const std::vector< HEdge* >& Mesh::boundaryEdges() const {
+const std::vector<HEdge *> &Mesh::boundaryEdges() const
+{
 	return mBHEdgeList;
 }
 
-const std::vector< Vertex* >& Mesh::vertices() const {
+const std::vector<Vertex *> &Mesh::vertices() const
+{
 	return mVertexList;
 }
 
-const std::vector< Face* >& Mesh::faces() const {
+const std::vector<Face *> &Mesh::faces() const
+{
 	return mFaceList;
 }
 
-
-bool Mesh::isVertexPosDirty() const {
+bool Mesh::isVertexPosDirty() const
+{
 	return mVertexPosFlag;
 }
 
-void Mesh::setVertexPosDirty(bool b) {
+void Mesh::setVertexPosDirty(bool b)
+{
 	mVertexPosFlag = b;
 }
 
-bool Mesh::isVertexNormalDirty() const {
+bool Mesh::isVertexNormalDirty() const
+{
 	return mVertexNormalFlag;
 }
 
-void Mesh::setVertexNormalDirty(bool b) {
+void Mesh::setVertexNormalDirty(bool b)
+{
 	mVertexNormalFlag = b;
 }
 
-bool Mesh::isVertexColorDirty() const {
+bool Mesh::isVertexColorDirty() const
+{
 	return mVertexColorFlag;
 }
 
-void Mesh::setVertexColorDirty(bool b) {
+void Mesh::setVertexColorDirty(bool b)
+{
 	mVertexColorFlag = b;
 }
 
-bool Mesh::loadMeshFile(const std::string filename) {
+bool Mesh::loadMeshFile(const std::string filename)
+{
 	// Use libigl to parse the mesh file
 	bool iglFlag = igl::read_triangle_mesh(filename, mVertexMat, mFaceMat);
-	if (iglFlag) {
+	if (iglFlag)
+	{
 		clear();
 
 		// Construct the half-edge data structure.
@@ -313,59 +381,71 @@ bool Mesh::loadMeshFile(const std::string filename) {
 		int numFaces = mFaceMat.rows();
 
 		// Fill in the vertex list
-		for (int vidx = 0; vidx < numVertices; ++vidx) {
+		for (int vidx = 0; vidx < numVertices; ++vidx)
+		{
 			mVertexList.push_back(new Vertex(mVertexMat(vidx, 0),
-			                                 mVertexMat(vidx, 1),
-			                                 mVertexMat(vidx, 2)));
+											 mVertexMat(vidx, 1),
+											 mVertexMat(vidx, 2)));
 		}
 		// Fill in the face list
-		for (int fidx = 0; fidx < numFaces; ++fidx) {
+		for (int fidx = 0; fidx < numFaces; ++fidx)
+		{
 			addFace(mFaceMat(fidx, 0), mFaceMat(fidx, 1), mFaceMat(fidx, 2));
 		}
 
-		std::vector< HEdge* > hedgeList;
-		for (int i = 0; i < mBHEdgeList.size(); ++i) {
-			if (mBHEdgeList[i]->start()) {
+		std::vector<HEdge *> hedgeList;
+		for (int i = 0; i < mBHEdgeList.size(); ++i)
+		{
+			if (mBHEdgeList[i]->start())
+			{
 				hedgeList.push_back(mBHEdgeList[i]);
 			}
 			// TODO
 		}
 		mBHEdgeList = hedgeList;
 
-		for (int i = 0; i < mVertexList.size(); ++i) {
+		for (int i = 0; i < mVertexList.size(); ++i)
+		{
 			mVertexList[i]->adjHEdges.clear();
 			mVertexList[i]->setIndex(i);
 			mVertexList[i]->setFlag(0);
 		}
-	} else {
+	}
+	else
+	{
 		std::cout << __FUNCTION__ << ": mesh file loading failed!\n";
 	}
 	return iglFlag;
 }
 
-static void _setPrevNext(HEdge* e1, HEdge* e2) {
+static void _setPrevNext(HEdge *e1, HEdge *e2)
+{
 	e1->setNext(e2);
 	e2->setPrev(e1);
 }
 
-static void _setTwin(HEdge* e1, HEdge* e2) {
+static void _setTwin(HEdge *e1, HEdge *e2)
+{
 	e1->setTwin(e2);
 	e2->setTwin(e1);
 }
 
-static void _setFace(Face* f, HEdge* e) {
+static void _setFace(Face *f, HEdge *e)
+{
 	f->setHalfEdge(e);
 	e->setFace(f);
 }
 
-void Mesh::addFace(int v1, int v2, int v3) {
-	Face* face = new Face();
+void Mesh::addFace(int v1, int v2, int v3)
+{
+	Face *face = new Face();
 
-	HEdge* hedge[3];
-	HEdge* bhedge[3]; // Boundary half-edges
-	Vertex* vert[3];
+	HEdge *hedge[3];
+	HEdge *bhedge[3]; // Boundary half-edges
+	Vertex *vert[3];
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		hedge[i] = new HEdge();
 		bhedge[i] = new HEdge(true);
 	}
@@ -374,7 +454,8 @@ void Mesh::addFace(int v1, int v2, int v3) {
 	vert[2] = mVertexList[v3];
 
 	// Connect prev-next pointers
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		_setPrevNext(hedge[i], hedge[(i + 1) % 3]);
 		_setPrevNext(bhedge[i], bhedge[(i + 1) % 3]);
 	}
@@ -388,13 +469,15 @@ void Mesh::addFace(int v1, int v2, int v3) {
 	bhedge[0]->setStart(vert[1]);
 	bhedge[1]->setStart(vert[0]);
 	bhedge[2]->setStart(vert[2]);
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		hedge[i]->setStart(vert[i]);
 	}
 
 	// Connect start pointers
 	// Connect face-hedge pointers
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		vert[i]->setHalfEdge(hedge[i]);
 		vert[i]->adjHEdges.push_back(hedge[i]);
 		_setFace(face, hedge[i]);
@@ -404,63 +487,77 @@ void Mesh::addFace(int v1, int v2, int v3) {
 	vert[2]->adjHEdges.push_back(bhedge[2]);
 
 	// Merge boundary if needed
-	for (int i = 0; i < 3; ++i) {
-		Vertex* start = bhedge[i]->start();
-		Vertex* end = bhedge[i]->end();
+	for (int i = 0; i < 3; ++i)
+	{
+		Vertex *start = bhedge[i]->start();
+		Vertex *end = bhedge[i]->end();
 
-		for (int j = 0; j < end->adjHEdges.size(); ++j) {
-			HEdge* curr = end->adjHEdges[j];
-			if (curr->isBoundary() && curr->end() == start) {
+		for (int j = 0; j < end->adjHEdges.size(); ++j)
+		{
+			HEdge *curr = end->adjHEdges[j];
+			if (curr->isBoundary() && curr->end() == start)
+			{
 				_setPrevNext(bhedge[i]->prev(), curr->next());
 				_setPrevNext(curr->prev(), bhedge[i]->next());
 				_setTwin(bhedge[i]->twin(), curr->twin());
 				bhedge[i]->setStart(nullptr); // Mark as unused
-				curr->setStart(nullptr); // Mark as unused
+				curr->setStart(nullptr);	  // Mark as unused
 				break;
 			}
 		}
 	}
 
 	// Finally add hedges and faces to list
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		mHEdgeList.push_back(hedge[i]);
 		mBHEdgeList.push_back(bhedge[i]);
 	}
 	mFaceList.push_back(face);
 }
 
-Eigen::Vector3f Mesh::initBboxMin() const {
+Eigen::Vector3f Mesh::initBboxMin() const
+{
 	return (mVertexMat.colwise().minCoeff()).transpose();
 }
 
-Eigen::Vector3f Mesh::initBboxMax() const {
+Eigen::Vector3f Mesh::initBboxMax() const
+{
 	return (mVertexMat.colwise().maxCoeff()).transpose();
 }
 
-void Mesh::groupingVertexFlags() {
+void Mesh::groupingVertexFlags()
+{
 	// Init to 255
-	for (Vertex* vert : mVertexList) {
-		if (vert->flag() != 0) {
+	for (Vertex *vert : mVertexList)
+	{
+		if (vert->flag() != 0)
+		{
 			vert->setFlag(255);
 		}
 	}
 	// Group handles
 	int id = 0;
-	std::vector< Vertex* > tmpList;
-	for (Vertex* vert : mVertexList) {
-		if (vert->flag() == 255) {
+	std::vector<Vertex *> tmpList;
+	for (Vertex *vert : mVertexList)
+	{
+		if (vert->flag() == 255)
+		{
 			++id;
 			vert->setFlag(id);
 
 			// Do search
 			tmpList.push_back(vert);
-			while (!tmpList.empty()) {
-				Vertex* v = tmpList.back();
+			while (!tmpList.empty())
+			{
+				Vertex *v = tmpList.back();
 				tmpList.pop_back();
 
 				OneRingVertex orv = OneRingVertex(v);
-				while (Vertex* v2 = orv.nextVertex()) {
-					if (v2->flag() == 255) {
+				while (Vertex *v2 = orv.nextVertex())
+				{
+					if (v2->flag() == 255)
+					{
 						v2->setFlag(id);
 						tmpList.push_back(v2);
 					}
@@ -470,17 +567,22 @@ void Mesh::groupingVertexFlags() {
 	}
 }
 
-void Mesh::clear() {
-	for (int i = 0; i < mHEdgeList.size(); ++i) {
+void Mesh::clear()
+{
+	for (int i = 0; i < mHEdgeList.size(); ++i)
+	{
 		delete mHEdgeList[i];
 	}
-	for (int i = 0; i < mBHEdgeList.size(); ++i) {
+	for (int i = 0; i < mBHEdgeList.size(); ++i)
+	{
 		delete mBHEdgeList[i];
 	}
-	for (int i = 0; i < mVertexList.size(); ++i) {
+	for (int i = 0; i < mVertexList.size(); ++i)
+	{
 		delete mVertexList[i];
 	}
-	for (int i = 0; i < mFaceList.size(); ++i) {
+	for (int i = 0; i < mFaceList.size(); ++i)
+	{
 		delete mFaceList[i];
 	}
 
@@ -490,7 +592,8 @@ void Mesh::clear() {
 	mFaceList.clear();
 }
 
-std::vector< int > Mesh::collectMeshStats() {
+std::vector<int> Mesh::collectMeshStats()
+{
 	int V = 0; // # of vertices
 	int E = 0; // # of half-edges
 	int F = 0; // # of faces
@@ -510,10 +613,10 @@ std::vector< int > Mesh::collectMeshStats() {
 	E = this->mHEdgeList.size() + this->mBHEdgeList.size();
 	F = this->mFaceList.size();
 	B = this->countBoundaryLoops();
-	
+
 	/*====== Programming Assignment 0 ======*/
 
-	std::vector< int > stats;
+	std::vector<int> stats;
 	stats.push_back(V);
 	stats.push_back(E);
 	stats.push_back(F);
@@ -523,16 +626,21 @@ std::vector< int > Mesh::collectMeshStats() {
 	return stats;
 }
 
-int Mesh::countBoundaryLoops() {
+int Mesh::countBoundaryLoops()
+{
 	int count = 0;
-	for(int i = 0; i < this->mBHEdgeList.size(); ++i) {
-		HEdge* edge = this->mBHEdgeList[i];
-		if(edge->flag) {
+	for (int i = 0; i < this->mBHEdgeList.size(); ++i)
+	{
+		HEdge *edge = this->mBHEdgeList[i];
+		if (edge->flag())
+		{
 			continue;
 		}
-		HEdge* nextEdge = edge->next();
-		while(edge != nextEdge) {
-			if(std::find(this->mBHEdgeList.begin(), this->mBHEdgeList.end(), nextEdge) != this->mBHEdgeList.end()) {
+		HEdge *nextEdge = edge->next();
+		while (edge != nextEdge)
+		{
+			if (std::find(this->mBHEdgeList.begin(), this->mBHEdgeList.end(), nextEdge) != this->mBHEdgeList.end())
+			{
 				nextEdge->setFlag(true);
 			}
 			nextEdge = nextEdge->next();
@@ -552,10 +660,17 @@ int Mesh::countBoundaryLoops() {
 
 	/*====== Programming Assignment 0 ======*/
 
+	for (int i = 0; i < this->mBHEdgeList.size(); ++i)
+	{
+		HEdge *edge = this->mBHEdgeList[i];
+		edge->setFlag(false);
+	}
+
 	return count;
 }
 
-int Mesh::countConnectedComponents() {
+int Mesh::countConnectedComponents()
+{
 	int count = 0;
 
 	/*====== Programming Assignment 0 ======*/
@@ -569,13 +684,13 @@ int Mesh::countConnectedComponents() {
 	/* the mesh. (Hint: use a stack)
 	/**********************************************/
 
-
 	/*====== Programming Assignment 0 ======*/
 
 	return count;
 }
 
-void Mesh::computeVertexNormals() {
+void Mesh::computeVertexNormals()
+{
 	/*====== Programming Assignment 0 ======*/
 
 	/**********************************************/
@@ -589,16 +704,56 @@ void Mesh::computeVertexNormals() {
 	/**********************************************/
 
 	/*====== Programming Assignment 0 ======*/
+	for (Vertex *v : mVertexList)
+	{
+		Eigen::Vector3f vertNormal = Eigen::Vector3f::Zero();
 
+		std::vector<HEdge *> adjHEdgeList;
+		OneRingHEdge orhe(v);
+		HEdge *curr = nullptr;
+		while (curr = orhe.nextHEdge())
+		{
+			adjHEdgeList.push_back(curr);
+		}
+
+		if (adjHEdgeList.size() >= 2)
+		{
+			const Eigen::Vector3f &p0 = v->position();
+			std::vector<Eigen::Vector3f> adjNormals;
+			std::vector<double> adjAreas;
+			double areaSum = 0;
+			for (HEdge *adjHedge : adjHEdgeList)
+			{
+				if (!adjHedge->isBoundary())
+				{
+					const Eigen::Vector3f &p1 = adjHedge->end()->position();
+					const Eigen::Vector3f &p2 = adjHedge->next()->end()->position();
+
+					adjNormals.push_back(triangleNormal(p0, p1, p2));
+
+					double area = triangleArea(p0, p1, p2);
+					adjAreas.push_back(area);
+					areaSum += area;
+				}
+			}
+			for (int aidx = 0; aidx < adjNormals.size(); ++aidx)
+			{
+				vertNormal += adjNormals[aidx] * adjAreas[aidx] / areaSum;
+			}
+		}
+
+		v->setNormal(vertNormal);
+	}
 	// Notify mesh shaders
 	setVertexNormalDirty(true);
 }
 
-
-void Mesh::umbrellaSmooth(bool cotangentWeights) {
+void Mesh::umbrellaSmooth(bool cotangentWeights)
+{
 	/*====== Programming Assignment 1 ======*/
 
-	if (cotangentWeights) {
+	if (cotangentWeights)
+	{
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -610,8 +765,48 @@ void Mesh::umbrellaSmooth(bool cotangentWeights) {
 		/* It is advised to double type to store the 
 		/* weights to avoid numerical issues.
 		/**********************************************/
+		for (Vertex *v : mVertexList)
+		{
+			Eigen::Vector3f vNewPos = Eigen::Vector3f::Zero();
 
-	} else {
+			OneRingVertex orv(v);
+			Vertex *curr = nullptr;
+			double sumW = 0.0;
+			while (curr = orv.nextVertex())
+			{
+				// alpha
+				double count = 0.0;
+				double w = 0.0;
+				Vertex* next = nullptr;
+				if(!curr->halfEdge()->isBoundary() && curr->halfEdge()->end() != v) {
+					next = curr->halfEdge()->end();
+					w +=  cosVectors(v->position(), curr->position(), next->position());
+					count += 1.0;
+				}
+				
+				// beta
+				if(!curr->halfEdge()->prev()->twin()->isBoundary() && curr->halfEdge()->prev()->twin()->prev()->start() != v) {
+					next = curr->halfEdge()->prev()->twin()->prev()->start();
+					w += cosVectors(v->position(), curr->position(), next->position());
+					count += 1.0;
+				}
+
+				if(count == 0.0)
+				{
+					continue;
+				}
+				w /= count;
+				vNewPos += w * curr->position();
+				sumW += w;
+				Eigen::Vector3f pos = curr ->position();
+			}
+
+			vNewPos /= sumW;
+			v->setPosition(vNewPos);
+		}
+	}
+	else
+	{
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -619,7 +814,21 @@ void Mesh::umbrellaSmooth(bool cotangentWeights) {
 		/* Step 2: Implement the uniform weighting 
 		/* scheme for explicit mesh smoothing.
 		/**********************************************/
+		for (Vertex *v : mVertexList)
+		{
+			Eigen::Vector3f vNewPos = Eigen::Vector3f::Zero();
 
+			OneRingVertex orv(v);
+			Vertex *curr = nullptr;
+			while (curr = orv.nextVertex())
+			{
+				// adjVertexs.push_back(curr);
+				vNewPos += curr->position();
+			}
+
+			vNewPos /= float(v->valence());
+			v->setPosition(vNewPos);
+		}
 	}
 
 	/*====== Programming Assignment 1 ======*/
@@ -629,16 +838,16 @@ void Mesh::umbrellaSmooth(bool cotangentWeights) {
 	setVertexPosDirty(true);
 }
 
-void Mesh::implicitUmbrellaSmooth(bool cotangentWeights) {
+void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
+{
 	/*====== Programming Assignment 1 ======*/
 
 	/* A sparse linear system Ax=b solver using the conjugate gradient method. */
-	auto fnConjugateGradient = [](const Eigen::SparseMatrix< float >& A,
-	                              const Eigen::VectorXf& b,
-	                              int maxIterations,
-	                              float errorTolerance,
-	                              Eigen::VectorXf& x)
-	{
+	auto fnConjugateGradient = [](const Eigen::SparseMatrix<float> &A,
+								  const Eigen::VectorXf &b,
+								  int maxIterations,
+								  float errorTolerance,
+								  Eigen::VectorXf &x) {
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -661,7 +870,8 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights) {
 	/* Please refer to the following link about the sparse matrix construction in Eigen. */
 	/* http://eigen.tuxfamily.org/dox/group__TutorialSparse.html#title3 */
 
-	if (cotangentWeights) {
+	if (cotangentWeights)
+	{
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -675,9 +885,9 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights) {
 		/* It is advised to double type to store the
 		/* weights to avoid numerical issues.
 		/**********************************************/
-
-
-	} else {
+	}
+	else
+	{
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -687,7 +897,6 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights) {
 		/* the above fnConjugateGradient for solving
 		/* sparse linear systems.
 		/**********************************************/
-
 	}
 
 	/*====== Programming Assignment 1 ======*/

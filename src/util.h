@@ -9,6 +9,8 @@
 #define VCOLOR_PURPLE Eigen::Vector3f(0.4f, 0.4f, 0.6f)
 #endif
 
+#include <iostream>
+
 // Some helper functions for computing triangle normals or areas
 static Eigen::Vector3f triangleNormal(const Eigen::Vector3f& p1,
                                       const Eigen::Vector3f& p2,
@@ -38,6 +40,14 @@ static double triangleCot(const Eigen::Vector3f& p1,
 		_dot_res = 1.0;
 	}
 	return 1.0 / std::tan(std::acos(_dot_res));
+}
+
+static double cosVectors(const Eigen::Vector3f& p1,
+                         const Eigen::Vector3f& p2,
+                         const Eigen::Vector3f& p3) {
+	Eigen::Vector3d v1 = Eigen::Vector3d(p2(0), p2(1), p2(2)) - Eigen::Vector3d(p1(0), p1(1), p1(2));
+	Eigen::Vector3d v2 = Eigen::Vector3d(p3(0), p3(1), p3(2)) - Eigen::Vector3d(p1(0), p1(1), p1(2));
+	return (v1.dot(v2) / v1.norm()) / v2.norm();
 }
 
 static Eigen::Vector3f gluProject(const Eigen::Matrix4f& mvp,
