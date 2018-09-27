@@ -632,6 +632,12 @@ int Mesh::countBoundaryLoops()
 	for (int i = 0; i < this->mBHEdgeList.size(); ++i)
 	{
 		HEdge *edge = this->mBHEdgeList[i];
+		edge->setFlag(true);
+	}
+
+	for (int i = 0; i < this->mBHEdgeList.size(); ++i)
+	{
+		HEdge *edge = this->mBHEdgeList[i];
 		if (edge->flag())
 		{
 			continue;
@@ -777,28 +783,30 @@ void Mesh::umbrellaSmooth(bool cotangentWeights)
 				// alpha
 				double count = 0.0;
 				double w = 0.0;
-				Vertex* next = nullptr;
-				if(!curr->halfEdge()->isBoundary() && curr->halfEdge()->end() != v) {
+				Vertex *next = nullptr;
+				if (!curr->halfEdge()->isBoundary() && curr->halfEdge()->end() != v)
+				{
 					next = curr->halfEdge()->end();
-					w +=  cosVectors(v->position(), curr->position(), next->position());
+					w += cosVectors(v->position(), curr->position(), next->position());
 					count += 1.0;
 				}
-				
+
 				// beta
-				if(!curr->halfEdge()->prev()->twin()->isBoundary() && curr->halfEdge()->prev()->twin()->prev()->start() != v) {
+				if (!curr->halfEdge()->prev()->twin()->isBoundary() && curr->halfEdge()->prev()->twin()->prev()->start() != v)
+				{
 					next = curr->halfEdge()->prev()->twin()->prev()->start();
 					w += cosVectors(v->position(), curr->position(), next->position());
 					count += 1.0;
 				}
 
-				if(count == 0.0)
+				if (count == 0.0)
 				{
 					continue;
 				}
 				w /= count;
 				vNewPos += w * curr->position();
 				sumW += w;
-				Eigen::Vector3f pos = curr ->position();
+				Eigen::Vector3f pos = curr->position();
 			}
 
 			vNewPos /= sumW;
@@ -864,6 +872,9 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
 		/* method.
 		/* Hint: https://en.wikipedia.org/wiki/Biconjugate_gradient_method
 		/**********************************************/
+		x = Eigen::VectorXf.zero(A.cols());
+		Eigen::VectorXf r0 = b - A * x;
+		
 	};
 
 	/* IMPORTANT:
