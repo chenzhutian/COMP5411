@@ -806,7 +806,6 @@ void Mesh::umbrellaSmooth(bool cotangentWeights)
 				w /= count;
 				vNewPos += w * curr->position();
 				sumW += w;
-				Eigen::Vector3f pos = curr->position();
 			}
 
 			vNewPos /= sumW;
@@ -849,13 +848,20 @@ void Mesh::umbrellaSmooth(bool cotangentWeights)
 void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
 {
 	/*====== Programming Assignment 1 ======*/
+	Eigen::VectorXd bx(mVertexList.size()), by(mVertexList.size()), bz(mVertexList.size()), x_sol(mVertexList.size()), y_sol(mVertexList.size()), z_sol(mVertexList.size());
+	for (int k = 0; k < mVertexList.size(); k++) {
+		bx[k] = mVertexList[k]->position()[0];
+		by[k] = mVertexList[k]->position()[1];
+		bz[k] = mVertexList[k]->position()[2];
+		x_sol[k] = y_sol[k] = z_sol[k] = 0;
+	}
 
 	/* A sparse linear system Ax=b solver using the conjugate gradient method. */
-	auto fnConjugateGradient = [](const Eigen::SparseMatrix<float> &A,
-								  const Eigen::VectorXf &b,
+	auto fnConjugateGradient = [](const Eigen::SparseMatrix<double> &A,
+								  const Eigen::VectorXd &b,
 								  int maxIterations,
 								  float errorTolerance,
-								  Eigen::VectorXf &x) {
+								  Eigen::VectorXd &x) {
 		/**********************************************/
 		/*          Insert your code here.            */
 		/**********************************************/
@@ -872,15 +878,34 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
 		/* method.
 		/* Hint: https://en.wikipedia.org/wiki/Biconjugate_gradient_method
 		/**********************************************/
-		x = Eigen::VectorXf.zero(A.cols());
-		Eigen::VectorXf r0 = b - A * x;
-		
+		// x = Eigen::VectorXf.zero(A.cols());
+
+		Eigen::VectorXd r = b - A * x;
+		Eigen::VectorXd p(r);
+		int i = 0;
+		while(i < maxIterations) {
+			double alpha = ((r.transpose() * r) / (p.transpose() * A * p)).value();
+			x = x + alpha * p;
+			Eigen::VectorXd r1 = r - alpha * A * p;
+			
+			if(r1.norm() <= errorTolerance ) break;
+
+			double beta = ((r1.transpose() * r1) / (r.transpose() * r)).value();
+			p = r1 + beta * p;
+			r = r1;
+			++i;
+		}
 	};
 
 	/* IMPORTANT:
 	/* Please refer to the following link about the sparse matrix construction in Eigen. */
 	/* http://eigen.tuxfamily.org/dox/group__TutorialSparse.html#title3 */
 
+	Eigen::SparseMatrix<double> mat(mVertexList.size(),mVertexList.size());
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	tripletList.reserve(0);
+		
 	if (cotangentWeights)
 	{
 		/**********************************************/
@@ -896,6 +921,49 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
 		/* It is advised to double type to store the
 		/* weights to avoid numerical issues.
 		/**********************************************/
+		for(int i = 0; i < mVertexList.size(); ++i)
+		{
+			Vertex *v = mVertexList[i];
+			std::vector<T> tmpTripletList;
+
+			OneRingVertex orv(v);
+			Vertex *curr = nullptr;
+			double sumW = 0.0;
+			while (curr = orv.nextVertex())
+			{
+				// alpha
+				double count = 0.0;
+				double w = 0.0;
+				Vertex *next = nullptr;
+				if (!curr->halfEdge()->isBoundary() && curr->halfEdge()->end() != v)
+				{
+					next = curr->halfEdge()->end();
+					w += cosVectors(v->position(), curr->position(), next->position());
+					count += 1.0;
+				}
+
+				// beta
+				if (!curr->halfEdge()->prev()->twin()->isBoundary() && curr->halfEdge()->prev()->twin()->prev()->start() != v)
+				{
+					next = curr->halfEdge()->prev()->twin()->prev()->start();
+					w += cosVectors(v->position(), curr->position(), next->position());
+					count += 1.0;
+				}
+
+				if (count == 0.0)
+				{
+					continue;
+				}
+				w /= count;
+				tmpTripletList.push_back(T(v->index(), curr->index(), w));
+				sumW += w;
+			}
+			tripletList.push_back(T(v->index(), v->index(), -1.0));
+			for(int j = 0; j < tmpTripletList.size(); ++j){
+				T t = tmpTripletList[j];
+				tripletList.push_back(T(t.row(), t.col(), t.value() / sumW));
+			}
+		}
 	}
 	else
 	{
@@ -908,6 +976,28 @@ void Mesh::implicitUmbrellaSmooth(bool cotangentWeights)
 		/* the above fnConjugateGradient for solving
 		/* sparse linear systems.
 		/**********************************************/
+		for(int i = 0; i < mVertexList.size(); ++i)
+		{
+			Vertex *v = mVertexList[i];
+			tripletList.push_back(T(v->index(), v->index(), -1.0));
+			OneRingVertex orv(v);
+			Vertex *curr = nullptr;
+			while (curr = orv.nextVertex())
+			{
+				tripletList.push_back(T(v->index(), curr->index(), 1/ float(v->valence())));
+			}
+		}
+	}
+
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	Eigen::SparseMatrix<double> idMat(mVertexList.size(),mVertexList.size());
+	idMat.setIdentity();
+	fnConjugateGradient(idMat - mat, bx, 100, 1e-6, x_sol);
+	fnConjugateGradient(idMat - mat, by, 100, 1e-6, y_sol);
+	fnConjugateGradient(idMat - mat, bz, 100, 1e-6, z_sol);
+
+	for (int k = 0; k < mVertexList.size(); k++) {
+		mVertexList[k]->setPosition(Eigen::Vector3f((float)x_sol[k], (float)y_sol[k], (float)z_sol[k]));
 	}
 
 	/*====== Programming Assignment 1 ======*/
